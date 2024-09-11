@@ -6,10 +6,9 @@
   <div class="col-6">
     <div class="card mb-3">
       <div class="image-container">
-        <img
-          class="img-fluid"
-          alt="<%= campground.title %>"
-          src="<%= campground.image %>" />
+        <% for (let img of campground.images) {%>
+        <img class="img-fluid" alt="<%= img.filename %>" src="<%= img.url %>" />
+        <% } %>
       </div>
       <div class="card-body">
         <h5 class="card-title"><%= campground.title%></h5>

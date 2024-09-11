@@ -13,9 +13,18 @@ const CampgroundsController = {
   },
 
   addNewCampground: catchAsync(async (req, res, next) => {
-    const campground = new Campground(req.body.campground);
+    const fileImage = req.files.map((file) => ({
+      url: file.path,
+      filename: file.filename,
+    }));
+    console.log(fileImage);
+    const campground = new Campground({
+      ...req.body.campground,
+      images: fileImage,
+    });
     campground.author = req.user._id;
     await campground.save();
+    console.log(campground);
     req.flash("success", "Successfully made a new campground!");
     res.redirect(`/campgrounds/${campground._id}`);
   }),
