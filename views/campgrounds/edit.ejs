@@ -1,57 +1,122 @@
 <% layout('layouts/boilerplate')%>
 <div class="row">
-    <h1 class="text-center">Edit Campground</h1>
-    <div class="col-6 offset-3">
-        <form action="/campgrounds/<%=campground._id%>?_method=PUT" method="POST" novalidate class="validated-form">
-            <div class="mb-3">
-                <label class="form-label" for="title">Title</label>
-                <input class="form-control" type="text" id="title" name="campground[title]"
-                    value="<%=campground.title %>" required>
-                <div class="valid-feedback">
-                    Looks good!
-                </div>
-            </div>
-            <div class="mb-3">
-                <label class="form-label" for="location">Location</label>
-                <input class="form-control" type="text" id="location" name="campground[location]"
-                    value="<%=campground.location %>" required>
-                <div class="valid-feedback">
-                    Looks good!
-                </div>
-            </div>
-            <div class="mb-3">
-                <label class="form-label" for="image">Image Url</label>
-                <input class="form-control" type="text" id="image" name="campground[image]"
-                    value="<%=campground.image %>" required>
-                <div class="valid-feedback">
-                    Looks good!
-                </div>
-            </div>
-            <div class="mb-3">
-                <label class="form-label" for="price">Campground Price</label>
-                <div class="input-group">
-                    <span class="input-group-text" id="price-label">$</span>
-                    <input type="text" class="form-control" id="price" placeholder="0.00" aria-label="price"
-                        aria-describedby="price-label" name="campground[price]" value="<%=campground.price %>"
-                        required>\<div class="valid-feedback">
-                        Looks good!
-                    </div>
-                </div>
-            </div>
+  <h1 class="text-center">Edit Campground</h1>
+  <div class="col-6 offset-3">
+    <form
+      action="/campgrounds/<%=campground._id%>?_method=PUT"
+      method="POST"
+      novalidate
+      class="validated-form"
+      enctype="multipart/form-data">
+      <div class="mb-3">
+        <label class="form-label" for="title">Title</label>
+        <input
+          class="form-control"
+          type="text"
+          id="title"
+          name="campground[title]"
+          value="<%=campground.title %>"
+          required />
+        <div class="valid-feedback">Looks good!</div>
+      </div>
+      <div class="mb-3">
+        <label class="form-label" for="location">Location</label>
+        <input
+          class="form-control"
+          type="text"
+          id="location"
+          name="campground[location]"
+          value="<%=campground.location %>"
+          required />
+        <div class="valid-feedback">Looks good!</div>
+      </div>
+      <div class="mb-3">
+        <label class="form-label" for="image">Update Image(s)</label>
+        <div class="form-file custom-file">
+          <input
+            type="file"
+            class="form-file-input"
+            id="image"
+            name="image"
+            multiple />
+          <label class="form-file-label" for="image">
+            <span class="form-file-text custom-file-label"
+              >Update image(s)...</span
+            >
+            <span class="form-file-button">Browse</span>
+          </label>
+        </div>
+      </div>
 
-            <div class="mb-3">
-                <label class="form-label" for="description">Description</label>
-                <textarea class="form-control" type="text" id="description" name="campground[description]"
-                    required><%= campground.description%></textarea>
-                <div class="valid-feedback">
-                    Looks good!
-                </div>
+      <div class="mb-3">
+        <label class="form-label" for="img-edit">Select Deleted Image :</label>
+        <div class="container-img-edit" id="img-edit">
+          <% campground.images.forEach((image, index) =>{ %>
+          <div class="card-img-edit">
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="img-<%= index %>"
+                name="deleteImages[]"
+                value="<%= image.filename %>" />
+              <label class="form-check-label" for="img-<%= index %>"></label>
             </div>
-            <div class="mb-3">
-                <button class="btn btn-info">Update Campground</button>
-            </div>
-        </form>
-        <a href="/campgrounds/<%= campground._id%>">Back To Campground</a>
+            <img src="<%= image.url %>" class="img-thumbnail img-edit" alt="" />
+          </div>
+          <% }) %>
+        </div>
+      </div>
+      <div class="mb-3">
+        <label class="form-label" for="price">Campground Price</label>
+        <div class="input-group">
+          <span class="input-group-text" id="price-label">$</span>
+          <input
+            type="text"
+            class="form-control"
+            id="price"
+            placeholder="0.00"
+            aria-label="price"
+            aria-describedby="price-label"
+            name="campground[price]"
+            value="<%=campground.price %>"
+            required />
+          <div class="valid-feedback">Looks good!</div>
+        </div>
+      </div>
 
-    </div>
+      <div class="mb-3">
+        <label class="form-label" for="description">Description</label>
+        <textarea
+          class="form-control"
+          type="text"
+          id="description"
+          name="campground[description]"
+          required>
+<%= campground.description%></textarea
+        >
+        <div class="valid-feedback">Looks good!</div>
+      </div>
+      <div class="mb-3">
+        <button class="btn btn-info">Update Campground</button>
+      </div>
+    </form>
+    <a href="/campgrounds/<%= campground._id%>">Back To Campground</a>
+  </div>
 </div>
+
+<style>
+  .img-edit {
+    width: 150px;
+    max-width: 2150px;
+    height: auto;
+    margin-bottom: 10px;
+    object-fit: cover;
+  }
+
+  .container-img-edit {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+</style>

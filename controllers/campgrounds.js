@@ -1,5 +1,6 @@
 const Campground = require("../models/campground");
 const catchAsync = require("../utils/catchAsync");
+const { cloudinary } = require("../cloudinary");
 
 const CampgroundsController = {
   renderIndex: catchAsync(async (req, res) => {
@@ -55,10 +56,26 @@ const CampgroundsController = {
   }),
 
   updateCampground: catchAsync(async (req, res) => {
+    console.log(req.body);
+    const fileImage = req.files.map((file) => ({
+      url: file.path,
+      filename: file.filename,
+    }));
     const { id } = req.params;
     const campground = await Campground.findByIdAndUpdate(id, {
       ...req.body.campground,
+      // images: fileImage,
     });
+    campground.images.push(...fileImage);
+    campground.save();
+    if (req.body.deleteImages) {
+      for (let filename of req.body.deleteImages) {
+        await cloudinary.uploader.destroy(filename);
+      }
+      await campground.updateOne({
+        $pull: { images: { filename: { $in: req.body.deleteImages } } },
+      });
+    }
     req.flash("success", "Successfully updated campground!");
     res.redirect(`/campgrounds/${campground._id}`);
   }),

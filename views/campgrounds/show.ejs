@@ -4,12 +4,36 @@
 
 <div class="row">
   <div class="col-6">
-    <div class="card mb-3">
-      <div class="image-container">
-        <% for (let img of campground.images) {%>
-        <img class="img-fluid" alt="<%= img.filename %>" src="<%= img.url %>" />
-        <% } %>
+    <div id="carouselExample" class="carousel slide">
+      <div class="carousel-inner">
+        <% campground.images.forEach((img, i) => {%>
+        <div class="carousel-item image-container <%= i == 0 ? "active" : "" %> ">
+          <img
+            class="d-block w-100"
+            alt="<%= img.filename %>"
+            src="<%= img.url %>" />
+        </div>
+
+        <% }) %>
       </div>
+      <% if(campground.images.length > 1 ) {%>
+        <a
+        class="carousel-control-prev"
+        role="button"
+        href="#carouselExample"
+        data-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      </a>
+      <a
+        class="carousel-control-next"
+        role="button"
+        href="#carouselExample"
+        data-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      </a>
+        <% } %>
+    </div>
+    <div class="card mb-3">
       <div class="card-body">
         <h5 class="card-title"><%= campground.title%></h5>
         <p class="card-text"><%= campground.description%></p>
@@ -145,7 +169,7 @@
 <style>
   .image-container {
     width: 100%;
-    height: 500px;
+    height: 400px;
     overflow: hidden;
     position: relative;
   }
@@ -153,8 +177,5 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    position: absolute;
-    top: 0;
-    left: 0;
   }
 </style>
