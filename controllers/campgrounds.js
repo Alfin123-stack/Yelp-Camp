@@ -1,8 +1,7 @@
 const Campground = require("../models/campground");
 const catchAsync = require("../utils/catchAsync");
-const mbxGeocoding = require("@mapbox/mapbox-sdk/services/geocoding");
-const mapBoxToken = process.env.MAPBOX_TOKEN;
-const geocoder = mbxGeocoding({ accessToken: mapBoxToken });
+const maptilerClient = require("@maptiler/client");
+maptilerClient.config.apiKey = process.env.MAPTILER_API_KEY;
 const { cloudinary } = require("../cloudinary");
 
 const CampgroundsController = {
@@ -21,16 +20,15 @@ const CampgroundsController = {
       url: file.path,
       filename: file.filename,
     }));
+    const geoData = await maptilerClient.geocoding.forward(
+      req.body.campground.location,
+      { limit: 1 }
+    );
     const campground = new Campground({
       ...req.body.campground,
       images: fileImage,
     });
-    //   const geoData = await geocoder.forwardGeocode({
-    //     query: req.body.campground.location,
-    //     limit: 1
-    // }).send()
-    // const campground = new Campground(req.body.campground);
-    // campground.geometry = geoData.body.features[0].geometry
+    campground.geometry = geoData.features[0].geometry;
     campground.author = req.user._id;
     await campground.save();
     console.log(campground);
@@ -64,7 +62,6 @@ const CampgroundsController = {
   }),
 
   updateCampground: catchAsync(async (req, res) => {
-    console.log(req.body);
     const fileImage = req.files.map((file) => ({
       url: file.path,
       filename: file.filename,
@@ -74,6 +71,11 @@ const CampgroundsController = {
       ...req.body.campground,
       // images: fileImage,
     });
+    const geoData = await maptilerClient.geocoding.forward(
+      req.body.campground.location,
+      { limit: 1 }
+    );
+    campground.geometry = geoData.features[0].geometry;
     campground.images.push(...fileImage);
     campground.save();
     if (req.body.deleteImages) {
