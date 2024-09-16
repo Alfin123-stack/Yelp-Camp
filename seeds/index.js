@@ -49,6 +49,16 @@ const options = {
 // // Memanggil fungsi untuk fetch data
 // fetchData();
 
+function hello(name, origin = "Bandung") {
+  // const result = ("hallo nama saya "+ name + "."+"saya tinggal di "+ origin)
+  const result = `hallo nama saya ${name}. saya tinggal di ${origin}`;
+
+  return result;
+}
+
+const rahmat = hello("Rahmat", "Semarang");
+console.log(rahmat);
+
 const seedDB = async () => {
   await Campground.deleteMany({});
   for (let i = 0; i < 300; i++) {
