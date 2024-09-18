@@ -21,6 +21,11 @@ const campgroundRoutes = require("./routes/campgrounds");
 const reviewRoutes = require("./routes/reviews");
 const { name } = require("ejs");
 
+const MongoStore = require("connect-mongo");
+
+const mongoDbUrl = process.env.MONGO_DB_URL;
+
+// "mongodb://localhost:27017/yelp-camp"
 mongoose.connect("mongodb://localhost:27017/yelp-camp", {
   useNewUrlParser: true,
   useCreateIndex: true,
@@ -43,21 +48,6 @@ app.set("views", path.join(__dirname, "views"));
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
 app.use(express.static(path.join(__dirname, "public")));
-
-const sessionConfig = {
-  name: "session",
-  secret: "thisshouldbeabettersecret!",
-  resave: false,
-  saveUninitialized: true,
-  cookie: {
-    httpOnly: true,
-    // secure : true,
-    expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
-    maxAge: 1000 * 60 * 60 * 24 * 7,
-  },
-};
-
-app.use(mongoSanitize());
 
 const scriptSrcUrls = [
   "https://stackpath.bootstrapcdn.com/",
@@ -109,7 +99,33 @@ app.use(
   })
 );
 
+const store = MongoStore.create({
+  mongoUrl: "mongodb://localhost:27017/yelp-camp",
+  touchAfter: 24 * 60 * 60,
+  crypto: {
+    secret: "thisshouldbeabettersecret!",
+  },
+});
+
+store.on("error", function (e) {
+  console.log("SESSION STORE ERROR", e);
+});
+
+const sessionConfig = {
+  store: store,
+  name: "session",
+  secret: "thisshouldbeabettersecret!",
+  resave: false,
+  saveUninitialized: true,
+  cookie: {
+    httpOnly: true,
+    // secure : true,
+    expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
+    maxAge: 1000 * 60 * 60 * 24 * 7,
+  },
+};
 app.use(session(sessionConfig));
+app.use(mongoSanitize());
 app.use(flash());
 
 app.use(passport.initialize());

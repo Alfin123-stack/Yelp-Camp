@@ -1,0 +1,49 @@
+.image-container {
+  width: 100%;
+  height: 400px;
+  overflow: hidden;
+  position: relative;
+}
+.image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.review {
+  height: 70vh; /* Tinggi */
+  overflow: scroll; /* Mengaktifkan scroll */
+  border: 1px solid #ddd; /* Border lembut */
+  border-radius: 5px; /* Sudut membulat */
+  background-color: white; /* Latar belakang putih */
+  padding: 10px; /* Ruang dalam */
+}
+
+/* Mengatur scroll bar untuk WebKit (Chrome, Safari) */
+.review::-webkit-scrollbar {
+  width: 8px; /* Lebar scrollbar */
+}
+
+.review::-webkit-scrollbar-track {
+  background: transparent; /* Latar belakang track transparan */
+}
+
+.review::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.5); /* Warna dan transparansi untuk thumb */
+  border-radius: 10px; /* Radius sudut thumb */
+}
+
+.review::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.7); /* Warna thumb saat hover */
+}
+
+/* Mengatur scroll bar untuk Firefox */
+.review {
+  scrollbar-width: thin; /* Lebar scrollbar */
+  scrollbar-color: rgba(0, 0, 0, 0.5) transparent; /* Warna thumb dan track */
+}
+
+.no-review {
+  height: 50vh;
+  font-size: 1.2rem;
+}
