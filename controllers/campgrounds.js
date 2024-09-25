@@ -28,7 +28,13 @@ const CampgroundsController = {
       ...req.body.campground,
       images: fileImage,
     });
-    campground.geometry = geoData.features[0].geometry;
+    if (geoData.features.length > 0) {
+      campground.geometry = geoData.features[0].geometry;
+    } else {
+      req.flash("error", "Location not found!");
+      return res.redirect("/campgrounds"); // Ensure to return after redirect
+    }
+
     campground.author = req.user._id;
     await campground.save();
     console.log(campground);
@@ -67,17 +73,26 @@ const CampgroundsController = {
       filename: file.filename,
     }));
     const { id } = req.params;
+
     const campground = await Campground.findByIdAndUpdate(id, {
       ...req.body.campground,
-      // images: fileImage,
     });
+
     const geoData = await maptilerClient.geocoding.forward(
       req.body.campground.location,
       { limit: 1 }
     );
-    campground.geometry = geoData.features[0].geometry;
+
+    if (geoData.features.length > 0) {
+      campground.geometry = geoData.features[0].geometry;
+    } else {
+      req.flash("error", "Location not found!");
+      return res.redirect("/campgrounds");
+    }
+
     campground.images.push(...fileImage);
-    campground.save();
+    await campground.save(); // Ensure to await this
+
     if (req.body.deleteImages) {
       for (let filename of req.body.deleteImages) {
         await cloudinary.uploader.destroy(filename);
@@ -86,8 +101,9 @@ const CampgroundsController = {
         $pull: { images: { filename: { $in: req.body.deleteImages } } },
       });
     }
+
     req.flash("success", "Successfully updated campground!");
-    res.redirect(`/campgrounds/${campground._id}`);
+    return res.redirect(`/campgrounds/${campground._id}`); // Ensure to return here
   }),
 
   deleteCampground: catchAsync(async (req, res) => {

@@ -12,7 +12,7 @@ router
 
 router
   .route("/login")
-  .get(UsersController.renderLoginFrom)
+  .get(UsersController.renderLoginForm)
   .post(
     // use the storeReturnTo middleware to save the returnTo value from session to res.locals
     storeReturnTo,

@@ -22,7 +22,7 @@ const UsersController = {
     }
   }),
 
-  renderLoginFrom: (req, res) => {
+  renderLoginForm: (req, res) => {
     res.render("users/login");
   },
 
@@ -33,9 +33,14 @@ const UsersController = {
   },
 
   logOutUser: (req, res) => {
-    req.logout();
-    req.flash("success", "Goodbye!");
-    res.redirect("/campgrounds");
+    req.logout((err) => {
+      if (err) {
+        req.flash("error", "Error logging out. Please try again.");
+        return res.redirect("/campgrounds");
+      }
+      req.flash("success", "Goodbye!");
+      return res.redirect("/campgrounds");
+    });
   },
 };
 

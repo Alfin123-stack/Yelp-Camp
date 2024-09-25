@@ -19,19 +19,19 @@ const User = require("./models/user");
 const userRoutes = require("./routes/users");
 const campgroundRoutes = require("./routes/campgrounds");
 const reviewRoutes = require("./routes/reviews");
-const { name } = require("ejs");
 
 const MongoStore = require("connect-mongo");
 
-const mongoDbUrl = process.env.MONGO_DB_URL;
+const mongoDbUrl = process.env.DB_URL || "mongodb://localhost:27017/yelp-camp";
 
-// "mongodb://localhost:27017/yelp-camp"
-mongoose.connect("mongodb://localhost:27017/yelp-camp", {
-  useNewUrlParser: true,
-  useCreateIndex: true,
-  useUnifiedTopology: true,
-  useFindAndModify: false,
-});
+mongoose
+  .connect(mongoDbUrl)
+  .then(() => console.log("MongoDB connected"))
+  .catch((err) => {
+    console.error("MongoDB connection error:", err);
+    console.error("Full Error:", JSON.stringify(err, null, 2)); // Menampilkan detail error
+    process.exit(1); // Keluar jika gagal terhubung
+  });
 
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "connection error:"));
@@ -99,11 +99,13 @@ app.use(
   })
 );
 
+const secret = process.env.SECRET || "thisshouldbeabettersecret!";
+
 const store = MongoStore.create({
-  mongoUrl: "mongodb://localhost:27017/yelp-camp",
+  mongoUrl: mongoDbUrl,
   touchAfter: 24 * 60 * 60,
   crypto: {
-    secret: "thisshouldbeabettersecret!",
+    secret,
   },
 });
 
@@ -114,7 +116,7 @@ store.on("error", function (e) {
 const sessionConfig = {
   store: store,
   name: "session",
-  secret: "thisshouldbeabettersecret!",
+  secret,
   resave: false,
   saveUninitialized: true,
   cookie: {
@@ -154,12 +156,13 @@ app.all("*", (req, res, next) => {
   next(new ExpressError("Page Not Found", 404));
 });
 
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log(`Serving on port ${port}`);
+});
+
 app.use((err, req, res, next) => {
   const { statusCode = 500 } = err;
   if (!err.message) err.message = "Oh No, Something Went Wrong!";
   res.status(statusCode).render("error", { err });
-});
-
-app.listen(3000, () => {
-  console.log("Serving on port 3000");
 });
